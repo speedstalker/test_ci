@@ -26,6 +26,9 @@ timestamps {
 			},
 			"build_mac": {
 				buildUnix("mac", "build_mac")
+			},
+			"build_lin": {
+				buildUnix("linux", "build_linux")
 			}
 		)
 	}
