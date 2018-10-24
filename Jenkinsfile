@@ -3,10 +3,11 @@
 def buildUnix(label, stash_label) {
 	node(label) {
 		checkout scm
-		sh '''#!/bin/sh
+		sh """#!/bin/sh
 			gcc hello.c -o hello_${label}.out
-		'''
+		"""
 		stash name: stash_label, includes: "*.out"
+		deleteDir()
 	}
 }
 
@@ -22,16 +23,24 @@ timestamps {
 						cl.exe hello.c
 					"""
 					stash name: "build_win", includes: "*.exe"
+					deleteDir()
 				}
 			},
 			"build_mac": {
 				buildUnix("mac", "build_mac")
 			},
 			"build_lin": {
-				buildUnix("linux", "build_linux")
+				buildUnix("linux", "build_lin")
 			}
 		)
 	}
 	stage('store') {
+		node("master") {
+			unstash "build_mac"
+			unstash "build_win"
+			unstash "build_lin"
+			archiveArtifacts artifacts: "*", onlyIfSuccessful: true
+			deleteDir()
+		}
 	}
 }
